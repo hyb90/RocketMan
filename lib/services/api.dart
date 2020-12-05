@@ -23,7 +23,7 @@ class ApiProvider {
       );
       responseJson = _response(response);
     } on SocketException {
-      throw FetchDataException('No Internet connection');
+      throw FetchDataException('No Internet Connection');
     }
     return responseJson;
   }
@@ -34,14 +34,13 @@ class ApiProvider {
         var responseJson = json.decode(response.body.toString());
         return responseJson;
       case 400:
-        throw BadRequestException();
+        throw BadRequestException(response.body.toString());
       case 401:
-        throw UnauthorisedException();
+        throw UnauthorisedException(response.body.toString());
       case 422:
-        throw InvalidInputException();
+        throw InvalidInputException(response.body.toString());
       default:
-        throw FetchDataException(
-            'Error occured while Communication with Server with StatusCode : ${response.statusCode}');
+        throw FetchDataException(response.body.toString()+'error code : '+response.statusCode.toString());
     }
   }
 

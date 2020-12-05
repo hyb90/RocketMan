@@ -12,22 +12,30 @@ class NextLaunchScreen extends StatefulWidget {
 }
 
 class _NextLaunchScreenState extends State<NextLaunchScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   ApiProvider _provider = ApiProvider();
   NextLaunch next;
   int estimateTs;
   bool loading=false;
+  String problem="";
   // get data of next launch
   getNext()async {
     setState(() {
       loading=true;
     });
-    final response = await _provider.get('next');
+    try{
+      final response = await _provider.get('nextt');
       setState(() {
         next = NextLaunch.fromJson(response);
         estimateTs = next.launchDateUnix * 1000;
-        loading = false;
+        loading=false;
       });
-
+    }catch(e){
+      setState(() {
+        problem=e.toString();
+        loading=false;
+      });
+    }
   }
   @override
   void initState() {
@@ -36,6 +44,7 @@ class _NextLaunchScreenState extends State<NextLaunchScreen> {
     // get data on widget initial
     getNext();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +56,7 @@ class _NextLaunchScreenState extends State<NextLaunchScreen> {
         backgroundColor: Colors.transparent,
         title:Text('Rocket Man',style: TextStyle(color: Colors.white))
     ),
-      body: loading?Loading(loadingMessage: 'Loading'):Column(
+      body: loading?Loading(loadingMessage: 'Loading'):problem!=""?Center(child: Text(problem,style: TextStyle(color: Colors.white),),):Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(

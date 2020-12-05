@@ -11,18 +11,26 @@ class _UpcomingScreenState extends State<UpcomingScreen> {
   ApiProvider _provider = ApiProvider();
   List <UpcomingLaunch> upcomings=[];
   bool loading=false;
+  String problem="";
   //Get List of Upcoming Launch
   getUpcoming()async {
     setState(() {
       loading=true;
     });
-    final response = await _provider.get('upcoming');
+    try{
+      final response = await _provider.get('upcoming');
       setState(() {
         for (Map i in response) {
           upcomings.add(UpcomingLaunch.fromJson(i));
         }
         loading = false;
       });
+    }catch(e){
+      setState(() {
+        problem=e.toString();
+        loading=false;
+      });
+    }
   }
   @override
   void initState() {
@@ -41,7 +49,7 @@ class _UpcomingScreenState extends State<UpcomingScreen> {
           backgroundColor: Colors.transparent,
           title:Text('Rocket Man',style: TextStyle(color: Colors.white))
       ),
-      body: loading?Loading(loadingMessage: 'loading',):Column(
+      body: loading?Loading(loadingMessage: 'Loading'):problem!=""?Center(child: Text(problem,style: TextStyle(color: Colors.white),),):Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
