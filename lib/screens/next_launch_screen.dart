@@ -24,7 +24,7 @@ class _NextLaunchScreenState extends State<NextLaunchScreen> {
       loading=true;
     });
     try{
-      final response = await _provider.get('nextt');
+      final response = await _provider.get('next');
       setState(() {
         next = NextLaunch.fromJson(response);
         estimateTs = next.launchDateUnix * 1000;
@@ -48,6 +48,7 @@ class _NextLaunchScreenState extends State<NextLaunchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key:_scaffoldKey,
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         centerTitle: true,

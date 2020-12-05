@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rocketman/models/upcoming_launch.dart';
 import 'package:rocketman/services/api.dart';
 import 'package:rocketman/widgets/network_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class UpcomingScreen extends StatefulWidget {
   @override
   _UpcomingScreenState createState() => _UpcomingScreenState();
@@ -10,18 +11,24 @@ class UpcomingScreen extends StatefulWidget {
 class _UpcomingScreenState extends State<UpcomingScreen> {
   ApiProvider _provider = ApiProvider();
   List <UpcomingLaunch> upcomings=[];
+  List<String> fav=[];
   bool loading=false;
   String problem="";
   //Get List of Upcoming Launch
   getUpcoming()async {
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
     setState(() {
+      fav=localStorage.getStringList('fav');
+      localStorage.setStringList('fav', fav);
       loading=true;
     });
     try{
       final response = await _provider.get('upcoming');
       setState(() {
         for (Map i in response) {
-          upcomings.add(UpcomingLaunch.fromJson(i));
+          UpcomingLaunch up=UpcomingLaunch.fromJson(i);
+          checkFav(up);
+          upcomings.add(up);
         }
         loading = false;
       });
@@ -30,6 +37,23 @@ class _UpcomingScreenState extends State<UpcomingScreen> {
         problem=e.toString();
         loading=false;
       });
+    }
+  }
+  addToFavorite(UpcomingLaunch up)async{
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    setState(() {
+      up.favorite=true;
+      fav.add(up.flightNumber.toString());
+      localStorage.setStringList('fav', fav);
+    });
+
+  }
+  checkFav(UpcomingLaunch up){
+    for(int i=0;i<fav.length;i++){
+      if(up.flightNumber.toString()==fav[i])
+        {
+          up.favorite=true;
+        }
     }
   }
   @override
@@ -67,6 +91,7 @@ class _UpcomingScreenState extends State<UpcomingScreen> {
                   opacity: 0.9,
                   child: Card(
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         ListTile(
@@ -81,7 +106,17 @@ class _UpcomingScreenState extends State<UpcomingScreen> {
                           title: Text('Launchpad'),
                           trailing: Text(upcomings[index].launchSite.siteName)
                         ),
-
+                        upcomings[index].favorite?Icon(Icons.favorite):Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: RaisedButton(
+                              color: Colors.black.withOpacity(0.3),
+                              child: Text('Add to Favorite'),
+                              onPressed:() {
+                                addToFavorite(upcomings[index]);
+                                print(upcomings[index].favorite);
+                              },
+                        ),
+                        )
                       ],
                     ),
                   ),

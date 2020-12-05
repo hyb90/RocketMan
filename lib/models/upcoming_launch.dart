@@ -13,7 +13,7 @@ class UpcomingLaunch {
   LaunchSite launchSite;
   Links links;
   bool upcoming;
-
+  bool favorite=false;
   UpcomingLaunch(
       {this.flightNumber,
         this.missionName,
