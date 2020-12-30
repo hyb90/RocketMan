@@ -74,13 +74,18 @@ class _NextLaunchScreenState extends State<NextLaunchScreen> {
                     stream: Stream.periodic(Duration(seconds: 1), (i) => i),
                     builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
                       DateFormat format = DateFormat("hh:mm:ss");
+                      var days;
                       int now = DateTime
                           .now()
                           .millisecondsSinceEpoch;
                       Duration remaining = Duration(milliseconds: (estimateTs)-now );
                       //Get remaining days
-                      var days='${remaining.inDays}';
-                      //Get remaining Time
+                      if(estimateTs-now<= 86400000) {
+                                     days = '0';
+                                  } else {
+                                     days = '${remaining.inDays}';
+                                  }
+                                  //Get remaining Time
                       var timeString = '${format.format(
                           DateTime.fromMillisecondsSinceEpoch(remaining.inMilliseconds))}';
                       return Column(

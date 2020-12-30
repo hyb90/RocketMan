@@ -43,12 +43,16 @@ class _UpcomingScreenState extends State<UpcomingScreen> {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     setState(() {
       up.favorite=true;
+      if(fav==null)
+        {fav=[up.flightNumber.toString()];}
+      else
       fav.add(up.flightNumber.toString());
       localStorage.setStringList('fav', fav);
     });
 
   }
   checkFav(UpcomingLaunch up){
+    if(fav!=null)
     for(int i=0;i<fav.length;i++){
       if(up.flightNumber.toString()==fav[i])
         {
